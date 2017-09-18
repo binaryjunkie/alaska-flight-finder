@@ -11,37 +11,68 @@ interface AirportFinderProps {
 }
 
 interface AirportFinderState {
-    airports?: Airport[];
+    data?: Airport[];
+    q?: string;
+    value?: Airport;
 }
 
 export class AirportFinder extends React.Component<AirportFinderProps, AirportFinderState> {
-    public static defaultProps: Partial<AirportFinderProps> = {
+    private static defaultProps: Partial<AirportFinderProps> = {
         placeholder: 'Search Airports',
+    }
+
+    constructor(props: AirportFinderProps) {
+        super(props);
+        this.state = {
+            data: [],
+            q: '',
+        };
     }
 
     componentDidMount() {
         fetch('api/airports')
             .then(response => response.json() as Promise<Airport[]>)
             .then(data => {
-                console.log("SO ThIS IS HAPPENING")
-                console.log(data)
-                this.setState({ airports: data });
+                this.setState({ data });
             });
     }
 
-    constructor(props: AirportFinderProps) {
-        super(props);
-        this.state = {};
+    handleSelect(value: Airport) {
+        this.setState({ value })
+    }
+
+    handleChange(event: React.FormEvent<HTMLInputElement>) {
+        this.setState({ q: event.currentTarget.value });
+    }
+
+    renderResultsList() {
+        const { data, q } = this.state;
+        let results: Airport[];
+        if (data && q) {
+            results = data.filter((airport: Airport) => {
+                const query = new RegExp(q, 'gi');
+                return query.test(airport.code) || query.test(airport.name);
+            });
+        } else {
+            results = [];
+        }
+
+        return (
+            <ul>
+                {results && results.map((airport: Airport) => (
+                    <li onClick={(e) => this.handleSelect(airport)} key={airport.code}> CODE: {airport.code} - {airport.name} </li>
+                ))}
+            </ul>
+        )
     }
 
     public render() {
         const { placeholder } = this.props;
+        const { data, q } = this.state;
         return (
             <div>
-                <input type="text" placeholder={placeholder} />
-                {this.state.airports && this.state.airports.map((airport) => (
-                    <p key={airport.code}> CODE: {airport.code} </p>
-                ))}
+                <input type="text" value={q} onChange={ (e) => this.handleChange(e) } placeholder={placeholder} />
+                { this.renderResultsList() }
             </div>
         );
     }
