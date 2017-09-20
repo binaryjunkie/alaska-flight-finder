@@ -70,7 +70,7 @@ export class AirportFinder extends React.Component<AirportFinderProps, AirportFi
         const { placeholder } = this.props;
         const { data, q } = this.state;
         return (
-            <div>
+            <div className="airport-finder">
                 <input type="text" value={q} onChange={ (e) => this.handleChange(e) } placeholder={placeholder} />
                 { this.renderResultsList() }
             </div>

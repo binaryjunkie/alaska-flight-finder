@@ -6,12 +6,12 @@ export interface LayoutProps {
 
 export class Layout extends React.Component<LayoutProps, {}> {
     public render() {
-        return <div className='container-fluid'>
-            <div className='row'>
-                <div className='col-sm-12 '>
-                    { this.props.children }
+        return (
+            <div className="container">
+                <div className="row">
+                    { this.props.children }                   
                 </div>
             </div>
-        </div>;
+        );
     }
 }

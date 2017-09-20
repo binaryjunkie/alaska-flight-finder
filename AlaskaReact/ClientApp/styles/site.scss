@@ -1,4 +1,16 @@
-﻿body {
+﻿$shadow-color: rgba(12,0,0,.4);
+$shadow-size: 1px 1px 5px;
+$color-primary: #01426a;
+$transition-delay: 150ms;
+
+@mixin text-shadow() {
+    text-shadow: $shadow-size $shadow-color;
+}
+@mixin box-shadow() {
+    box-shadow: $shadow-size $shadow-color;
+}
+
+body {
     background-image: url(../images/alaska-background.png);
     background-repeat: no-repeat;
     background-size: cover;
@@ -6,14 +18,66 @@
     width: 100vw;
     height: 100vh;
     color: #3c3b3f;
+    box-sizing: border-box;
+    padding-top:250px;
+}
 
-    h1, h2, h3, h4, h5, h6 {
+a {
+    color:#01426a;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', 'Helvetica', sans-serif;
+    font-weight: 700;
+    color: #01426a;
+    @include text-shadow();
+
+    &.light {
+        color: #fff;
+    }
+}
+.header-text {
+    margin-bottom: 30px;
+
+    h1 {
+        margin: 0;
+    }
+
+    h2 {
+        margin: 5px 0;
+    }
+}
+
+.airport-finder {
+    $padding-horizontal: 15px;
+    $padding-vertical: 8px;
+
+    input[type=text] {
         font-family: 'Montserrat', 'Helvetica', sans-serif;
-        font-weight: 700;
-        color: #01426a;
-        text-shadow: 1px 1px 5px rgba(12,0,0,.4);
-        &.light {
-            color: #fff;
+        padding: $padding-vertical $padding-horizontal;
+        font-size: 18px;
+        border-width: 0;
+        @include box-shadow();
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        background-color: rgba(255,255,255, .88);
+        position: absolute;
+        @include box-shadow();
+
+        & > li {
+            margin: 0;
+            padding: $padding-horizontal;
+            cursor: pointer;
+            transition: background-color $transition-delay;
+
+            &:hover {
+                background-color: $color-primary;
+                color: #fff;
+            }
         }
     }
 }
