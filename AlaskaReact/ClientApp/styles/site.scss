@@ -51,6 +51,7 @@ h1, h2, h3, h4, h5, h6 {
 .airport-finder {
     $padding-horizontal: 15px;
     $padding-vertical: 8px;
+    position:relative;
 
     input[type=text] {
         font-family: 'Montserrat', 'Helvetica', sans-serif;
@@ -58,23 +59,32 @@ h1, h2, h3, h4, h5, h6 {
         font-size: 18px;
         border-width: 0;
         @include box-shadow();
+        box-sizing:border-box;
+        width: 100%;
     }
 
     ul {
+        width: 100%;
         list-style: none;
         margin: 0;
         padding: 0;
         background-color: rgba(255,255,255, .88);
         position: absolute;
+        z-index: 1;
         @include box-shadow();
 
         & > li {
+            &.no-data {
+                text-align: center;
+            }
+            width: 100%;
+            box-sizing: border-box;
             margin: 0;
             padding: $padding-horizontal;
             cursor: pointer;
             transition: background-color $transition-delay;
 
-            &:hover {
+            &.active, &:hover {
                 background-color: $color-primary;
                 color: #fff;
             }
