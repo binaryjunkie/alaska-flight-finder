@@ -76,6 +76,7 @@ h1, h2, h3, h4, h5, h6 {
         & > li {
             &.no-data {
                 text-align: center;
+                cursor: auto;
             }
             width: 100%;
             box-sizing: border-box;
@@ -84,7 +85,7 @@ h1, h2, h3, h4, h5, h6 {
             cursor: pointer;
             transition: background-color $transition-delay;
 
-            &.active, &:hover {
+            &.active, &:hover:not(.no-data) {
                 background-color: $color-primary;
                 color: #fff;
             }

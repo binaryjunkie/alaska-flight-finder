@@ -1,13 +1,14 @@
 ﻿import * as React from 'react';
 import 'isomorphic-fetch';
 
-interface Airport {
+export interface Airport {
     code: string;
     name: string;
 }
 
 interface AirportFinderProps {
     placeholder?: string;
+    active?: boolean;
 }
 
 interface AirportFinderState {
@@ -16,6 +17,7 @@ interface AirportFinderState {
     q?: string;
     value?: Airport;
     selectedIndex: number;
+    active: boolean;
 }
 
 export class AirportFinder extends React.Component<AirportFinderProps, AirportFinderState> {
@@ -30,31 +32,28 @@ export class AirportFinder extends React.Component<AirportFinderProps, AirportFi
             results: [],
             q: '',
             selectedIndex: 0,
+            active: false,
         };
     }
 
-    componentDidMount() {
-        fetch('api/airports')
-            .then(response => response.json() as Promise<Airport[]>)
-            .then(data => {
-                this.setState({ data });
-            });
+    handleSelect = (value: Airport): any => {
+        return (event: React.FormEvent<HTMLInputElement>): void => {
+            console.log("SELECTING ")
+            const { results } = this.state;
+            this.setState({ value, selectedIndex: results.indexOf(value), active: false })
+        };
     }
 
-    handleFocus(event: React.FormEvent<HTMLInputElement>) {
-        console.log("BLUR");
+    handleFocus = (event: React.FormEvent<HTMLInputElement>): void => {
+        this.setState({ active: true });
     }
 
-    handleBlur(event: React.FormEvent<HTMLInputElement>) {
-        console.log("BLUR");
+    handleBlur = (event: React.FormEvent<HTMLInputElement>): void => {
+        this.setState({ active: false });
+
     }
 
-    handleSelect(value: Airport) {
-        const { results } = this.state;
-        this.setState({ value, selectedIndex: results.indexOf(value) })
-    }
-
-    handleChange(event: React.FormEvent<HTMLInputElement>) {
+    handleChange = (event: React.FormEvent<HTMLInputElement>): void => {
         const { data } = this.state;
         const q = event.currentTarget.value;
         let results: Airport[];
@@ -62,7 +61,6 @@ export class AirportFinder extends React.Component<AirportFinderProps, AirportFi
 
         if (data && q) {
             results = data.filter((airport: Airport) => {
-                // const query = new RegExp(q, 'i'); // doesn't like special characters, below is produces more reliable results than escaping those
                 const name = airport.name.toLowerCase();
                 const code = airport.code.toLowerCase();
                 const query = q.toLowerCase();
@@ -70,18 +68,16 @@ export class AirportFinder extends React.Component<AirportFinderProps, AirportFi
             });
         } else {
             results = [];
-            //selectedIndex = 0;
-        }
-
-        let newState = {
-            selectedIndex: (results.length !== this.state.results.length) ? 0 : selectedIndex
-
         }
         
-        this.setState({ q, results, selectedIndex });
+        this.setState({
+            q,
+            results,
+            selectedIndex: (results.length !== this.state.results.length) ? 0 : selectedIndex,
+        });
     }
 
-    handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>): void => {
         const keyCode = event.which;
         const { selectedIndex, results } = this.state;
 
@@ -92,7 +88,7 @@ export class AirportFinder extends React.Component<AirportFinderProps, AirportFi
 
         if (keyCode === 13) {
             event.preventDefault();
-            this.handleSelect(results[selectedIndex]);
+            this.handleSelect(results[selectedIndex])(event);
         }
         if (keyCode === 38) {
             event.preventDefault();
@@ -115,12 +111,18 @@ export class AirportFinder extends React.Component<AirportFinderProps, AirportFi
     }
 
     renderResultsList() {
-        const { results, selectedIndex, q } = this.state;
+        const { results, selectedIndex, q, active } = this.state;
         
         return (
             <ul>
                 {q && results.length > 0 && results.map((airport: Airport, index: Number) => (
-                    <li className={(index === selectedIndex) ? 'active' : ''} onClick={(e) => this.handleSelect(airport)} key={airport.code}> CODE: {airport.code} - {airport.name} </li>
+                    <li
+                        className={(index === selectedIndex) ? 'active' : ''}
+                        onClick={this.handleSelect(airport)}
+                        key={airport.code}
+                    >
+                        {airport.name} ({airport.code})
+                    </li>
                 ))}
                 {q && results.length === 0 && (
                     <li className="no-data">No results found</li>
@@ -129,13 +131,21 @@ export class AirportFinder extends React.Component<AirportFinderProps, AirportFi
         )
     }
 
-    public render() {
+    render() {
         const { placeholder } = this.props;
-        const { data, q } = this.state;
+        const { active, q } = this.state;
         return (
             <div className="airport-finder">
-                <input type="text" value={q} onKeyDown={(e) => this.handleKeyDown(e)} onChange={(e) => this.handleChange(e)} placeholder={placeholder} />
-                { this.renderResultsList() }
+                <input
+                    type="text"
+                    value={q}
+                    onFocus={this.handleFocus}
+                    onBlur={this.handleBlur}
+                    onKeyDown={this.handleKeyDown}
+                    onChange={this.handleChange}
+                    placeholder={placeholder}
+                />
+                { active && this.renderResultsList() }
             </div>
         );
     }
